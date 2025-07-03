@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ranking dos Melhores Avaliados</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background-color: #f4f4f4;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    table {
+      width: 70%;
+      margin: 0 auto;
+      border-collapse: collapse;
+      background-color: #fff;
+      border: 1px solid #ccc;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 12px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #eaeaea;
+    }
+
+    .mensagem {
+      text-align: center;
+      font-size: 18px;
+      color: #555;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Ranking dos Melhores Avaliados</h2>
+
+  <table id="rankingTable" style="display:none;">
+    <thead>
+      <tr>
+        <th>Posição</th>
+        <th>Nome do Aluno</th>
+        <th>Média Final (0 a 10)</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div id="mensagem" class="mensagem">
+    Nenhum dado encontrado. Por favor, preencha o formulário de avaliação e salve o ranking.
+  </div>
+
+  <script>
+    const dados = localStorage.getItem('rankingAlunos');
+    if (dados) {
+      const alunos = JSON.parse(dados);
+
+      if (alunos.length > 0) {
+        // Ordena pela média (notaTotal/4)
+        alunos.sort((a, b) => {
+          const mediaA = (a.participacao + a.comportamento + a.desempenho + a.presenca) / 4;
+          const mediaB = (b.participacao + b.comportamento + b.desempenho + b.presenca) / 4;
+          return mediaB - mediaA;
+        });
+
+        const tbody = document.querySelector('#rankingTable tbody');
+
+        alunos.forEach((aluno, index) => {
+          const media = ((aluno.participacao + aluno.comportamento + aluno.desempenho + aluno.presenca) / 4).toFixed(1);
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${index + 1}º</td>
+            <td>${aluno.nome}</td>
+            <td>${media}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        document.getElementById('rankingTable').style.display = 'table';
+        document.getElementById('mensagem').style.display = 'none';
+      }
+    }
+  </script>
+
+</body>
+</html>
