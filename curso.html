@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<title>Avaliação - Preencher Dados (Notas 0 a 10)</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 40px;
+    background-color: #f4f4f4;
+  }
+  h2 {
+    text-align: center;
+    color: #333;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    margin-bottom: 30px;
+  }
+  th, td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+  }
+  th {
+    background-color: #eaeaea;
+  }
+  input[type="text"], select, textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  textarea {
+    resize: vertical;
+    height: 60px;
+  }
+  .assinatura {
+    margin-top: 40px;
+    text-align: center;
+  }
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<h2>Avaliação Jovens aprendises senar</h2>
+
+<form id="avaliacaoForm">
+
+  <table>
+    <thead>
+      <tr>
+        <th>Nº</th>
+        <th>Nome do Aluno</th>
+        <th>Participação</th>
+        <th>Comportamento</th>
+        <th>Desempenho na hora do agro</th>
+        <th>Observações</th>
+      </tr>
+    </thead>
+    <tbody id="tbodyAlunos">
+      <!-- Linhas geradas via JS -->
+    </tbody>
+  </table>
+
+  <div style="text-align: right;">
+    <button type="button" id="btnSalvarRanking">Salvar Ranking</button>
+  </div>
+
+  <div class="assinatura">
+    ___________________________<br />
+    Assinatura do Avaliador
+  </div>
+
+</form>
+
+<script>
+  // Gera as linhas para 20 alunos com notas 0 a 10
+  const tbody = document.getElementById('tbodyAlunos');
+  for(let i=1; i<=20; i++) {
+    let options = '<option value="">Selecione</option>';
+    for(let n=0; n<=10; n++) {
+      options += `<option value="${n}">${n}</option>`;
+    }
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i}</td>
+      <td><input type="text" name="nome${i}" placeholder="Nome do aluno ${i}"></td>
+      <td>
+        <select name="participacao${i}">
+          ${options}
+        </select>
+      </td>
+      <td>
+        <select name="comportamento${i}">
+          ${options}
+        </select>
+      </td>
+      <td>
+        <select name="desempenho${i}">
+          ${options}
+        </select>
+      </td>
+      <td><textarea name="obs${i}" placeholder="Observações..."></textarea></td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  // Função salvar ranking no localStorage e abrir página ranking
+  document.getElementById('btnSalvarRanking').addEventListener('click', () => {
+    const alunos = [];
+    for(let i=1; i<=20; i++) {
+      const nome = document.querySelector(`[name="nome${i}"]`).value.trim();
+      const participacao = parseInt(document.querySelector(`[name="participacao${i}"]`).value);
+      const comportamento = parseInt(document.querySelector(`[name="comportamento${i}"]`).value);
+      const desempenho = parseInt(document.querySelector(`[name="desempenho${i}"]`).value);
+      const obs = document.querySelector(`[name="obs${i}"]`).value.trim();
+
+      // só considera se nome e as 3 notas forem números válidos
+      if(nome && !isNaN(participacao) && !isNaN(comportamento) && !isNaN(desempenho)) {
+        const notaTotal = participacao + comportamento + desempenho;
+        alunos.push({ nome, participacao, comportamento, desempenho, notaTotal, obs });
+      }
+    }
+
+    if(alunos.length === 0) {
+      alert('Por favor, preencha os dados de pelo menos um aluno com notas válidas.');
+      return;
+    }
+
+    // Ordena decrescente pelo total da nota
+    alunos.sort((a,b) => b.notaTotal - a.notaTotal);
+
+    // Salva no localStorage (JSON string)
+    localStorage.setItem('rankingAlunos', JSON.stringify(alunos));
+
+    // Abre página ranking numa nova aba
+    window.open('ranking.html', '_blank');
+  });
+</script>
+
+</body>
+</html>
